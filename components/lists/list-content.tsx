@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Edit2, Plus, Share, Trash2, Eye, Calendar } from "lucide-react";
@@ -68,15 +68,15 @@ export function ListContent({ listId, addItemSlug }: ListContentProps) {
     } else {
       setLoading(false);
     }
-  }, [user, listId]);
+  }, [user, listId, fetchList]);
 
   useEffect(() => {
     if (addItemSlug && list) {
       handleAddItem(addItemSlug);
     }
-  }, [addItemSlug, list]);
+  }, [addItemSlug, list, handleAddItem]);
 
-  const fetchList = async () => {
+  const fetchList = useCallback(async () => {
     try {
       setLoading(true);
       const response = await fetch(`/api/lists/${listId}`);
@@ -94,9 +94,9 @@ export function ListContent({ listId, addItemSlug }: ListContentProps) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [listId]);
 
-  const handleAddItem = async (itemSlug: string) => {
+  const handleAddItem = useCallback(async (itemSlug: string) => {
     if (!list) return;
 
     try {
@@ -115,7 +115,7 @@ export function ListContent({ listId, addItemSlug }: ListContentProps) {
     } catch (error) {
       console.error("Error adding item to list:", error);
     }
-  };
+  }, [list, listId, fetchList, router]);
 
   const removeItem = async (itemSlug: string) => {
     if (!confirm("Remove this item from the list?")) return;

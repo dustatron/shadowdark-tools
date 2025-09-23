@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { getUserLists, createList } from '@/lib/services/lists';
 import { HttpStatus } from '@/types/api';
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const supabase = await createClient();
 

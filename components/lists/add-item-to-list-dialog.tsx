@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Search, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,7 +13,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { MagicItem, MagicItemType, MagicItemRarity } from "@/types/magic-items";
+import { MagicItem, MagicItemRarity } from "@/types/magic-items";
 
 interface AddItemToListDialogProps {
   listId: string;
@@ -46,9 +46,9 @@ export function AddItemToListDialog({ listId, children, onItemAdded }: AddItemTo
       // Load initial items when dialog opens
       searchItems();
     }
-  }, [searchTerm, open]);
+  }, [searchTerm, open, searchItems]);
 
-  const searchItems = async () => {
+  const searchItems = useCallback(async () => {
     try {
       setLoading(true);
       const params = new URLSearchParams();
@@ -64,7 +64,7 @@ export function AddItemToListDialog({ listId, children, onItemAdded }: AddItemTo
     } finally {
       setLoading(false);
     }
-  };
+  }, [searchTerm]);
 
   const addItemToList = async (itemSlug: string) => {
     try {

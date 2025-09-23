@@ -6,7 +6,7 @@ import { Dice1, Dice2, Dice3, Dice4, Dice5, Dice6, Plus, List as ListIcon, Shuff
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/use-auth";
@@ -184,7 +184,7 @@ export function CreateTableForm() {
       {/* Fill Strategy */}
       <div className="space-y-4">
         <Label>Fill Strategy</Label>
-        <RadioGroup value={fillStrategy} onValueChange={(value: any) => setFillStrategy(value)}>
+        <RadioGroup value={fillStrategy} onValueChange={(value: "auto" | "manual" | "blank") => setFillStrategy(value)}>
           <div className="space-y-3">
             {fillStrategies.map((strategy) => (
               <div key={strategy.value} className="flex items-start space-x-3">
@@ -216,7 +216,7 @@ export function CreateTableForm() {
               <CardContent className="flex flex-col items-center justify-center py-8">
                 <ListIcon className="h-8 w-8 text-muted-foreground mb-2" />
                 <p className="text-muted-foreground text-center mb-4">
-                  You don't have any lists yet. Create a list first to use as a source for your table.
+                  You don&apos;t have any lists yet. Create a list first to use as a source for your table.
                 </p>
                 <Button variant="outline" asChild>
                   <Link href="/lists">

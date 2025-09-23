@@ -32,7 +32,6 @@ import {
   DieSize,
   RollTableData,
   RollTableRow,
-  RollTableGenerationOptions,
   CreateRollTableRequest,
 } from "@/types/tables";
 import { MagicItem } from "@/types/magic-items";

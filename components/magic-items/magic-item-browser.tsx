@@ -1,22 +1,19 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
-import { MagicItem, MagicItemSearchFilters, MagicItemType, MagicItemRarity } from "@/types/magic-items";
+import { useState, useEffect } from "react";
+import { MagicItemType, MagicItemRarity } from "@/types/magic-items";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Search, Filter, Grid, List as ListIcon, ChevronDown, Heart, Plus } from "lucide-react";
+import { Search, Filter, Grid, List as ListIcon, ChevronDown } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { useSearchStore, useSearchFilters, useSearchResults, useSearchQuery } from "@/lib/stores/search-store";
 import { useUIStore } from "@/lib/stores/ui-store";
 import { createSearchEngine, MagicItemSearchEngine } from "@/lib/utils/search";
 import { FavoriteButton } from "./favorite-button";
 import { AddToListButton } from "./add-to-list-button";
-
-const ITEMS_PER_PAGE = 12;
 
 const typeLabels: Record<MagicItemType, string> = {
   weapon: "Weapons",
@@ -48,7 +45,6 @@ const rarityColors: Record<MagicItemRarity, string> = {
 };
 
 export function MagicItemBrowser() {
-  const [allItems, setAllItems] = useState<MagicItem[]>([]);
   const [searchEngine, setSearchEngine] = useState<MagicItemSearchEngine | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -57,14 +53,11 @@ export function MagicItemBrowser() {
   const { viewMode, setViewMode } = useUIStore();
   const {
     query,
-    filters,
     setQuery,
-    setFilters,
     clearFilters,
     setResults,
     setSearching,
-    setSearchError,
-    performSearch
+    setSearchError
   } = useSearchStore();
   const {
     filters: searchFilters,

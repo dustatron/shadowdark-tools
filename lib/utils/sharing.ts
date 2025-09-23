@@ -3,7 +3,7 @@ import { nanoid } from 'nanoid';
 export interface ShareableContent {
   id: string;
   type: 'list' | 'table';
-  data: any;
+  data: unknown;
   metadata: {
     createdAt: string;
     expiresAt?: string;
@@ -211,7 +211,7 @@ export function getShareTokenStats(shareableContent: ShareableContent): {
  */
 export function createShareableList(
   listId: string,
-  listData: any,
+  listData: unknown,
   options: ShareOptions = {}
 ): ShareableContent {
   const now = new Date().toISOString();
@@ -238,7 +238,7 @@ export function createShareableList(
  */
 export function createShareableTable(
   tableId: string,
-  tableData: any,
+  tableData: unknown,
   options: ShareOptions = {}
 ): ShareableContent {
   const now = new Date().toISOString();
@@ -281,8 +281,8 @@ export async function copyShareUrlToClipboard(shareUrl: string): Promise<boolean
   try {
     await navigator.clipboard.writeText(shareUrl);
     return true;
-  } catch (error) {
-    console.error('Failed to copy to clipboard:', error);
+  } catch {
+    console.error('Failed to copy to clipboard');
     return false;
   }
 }
@@ -306,9 +306,9 @@ export async function shareViaWebShareAPI(
       url,
     });
     return true;
-  } catch (error) {
+  } catch {
     // User cancelled or error occurred
-    console.error('Web Share API failed:', error);
+    console.error('Web Share API failed');
     return false;
   }
 }
@@ -361,7 +361,7 @@ export function parseShareUrl(url: string): string | null {
     }
 
     return null;
-  } catch (error) {
+  } catch {
     return null;
   }
 }

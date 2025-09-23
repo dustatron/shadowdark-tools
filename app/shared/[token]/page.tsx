@@ -16,7 +16,7 @@ async function getSharedTable(token: string) {
     // In a real app, this would fetch from your API
     // For now, we'll handle this client-side in the SharedRollTableContent component
     return { token, exists: true };
-  } catch (error) {
+  } catch {
     return null;
   }
 }

@@ -15,7 +15,7 @@ export default function ItemNotFound() {
             <Search className="h-8 w-8 text-muted-foreground" />
           </div>
           <p className="text-muted-foreground">
-            The magic item you're looking for doesn't exist or may have been moved.
+            The magic item you&apos;re looking for doesn&apos;t exist or may have been moved.
           </p>
           <div className="flex flex-col sm:flex-row gap-2">
             <Button asChild className="flex-1">

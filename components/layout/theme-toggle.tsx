@@ -132,7 +132,7 @@ function ThemeToggleSkeleton({ variant, className }: { variant?: string; classNa
 
 // Advanced theme toggle with additional options
 export function AdvancedThemeToggle() {
-  const { theme, setTheme, themes: availableThemes } = useTheme();
+  const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = React.useState(false);
 
   React.useEffect(() => {

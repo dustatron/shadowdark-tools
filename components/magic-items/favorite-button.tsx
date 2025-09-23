@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
@@ -20,9 +20,9 @@ export function FavoriteButton({ itemSlug }: FavoriteButtonProps) {
     if (user) {
       checkFavoriteStatus();
     }
-  }, [user, itemSlug]);
+  }, [user, itemSlug, checkFavoriteStatus]);
 
-  const checkFavoriteStatus = async () => {
+  const checkFavoriteStatus = useCallback(async () => {
     if (!user) return;
 
     try {
@@ -34,7 +34,7 @@ export function FavoriteButton({ itemSlug }: FavoriteButtonProps) {
     } catch (error) {
       console.error("Error checking favorite status:", error);
     }
-  };
+  }, [user, itemSlug]);
 
   const toggleFavorite = async () => {
     if (!user) {

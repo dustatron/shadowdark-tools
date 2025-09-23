@@ -1,5 +1,4 @@
 import { RollTableData, RollTableRow, DieSize, RollTableGenerationOptions } from '@/types/tables';
-import { MagicItem } from '@/types/magic-items';
 
 /**
  * Generate a complete roll table from source items
@@ -76,7 +75,7 @@ function createAutoFilledEntry(
   }
 
   // Select item based on distribution strategy
-  const selectedItem = selectItemForRoll(roll, availableItems, sourceItems.length);
+  const selectedItem = selectItemForRoll(roll, availableItems);
 
   return {
     roll,
@@ -87,7 +86,7 @@ function createAutoFilledEntry(
 /**
  * Select an item for a specific roll using weighted distribution
  */
-function selectItemForRoll(roll: number, availableItems: string[], totalSourceItems: number): string {
+function selectItemForRoll(roll: number, availableItems: string[]): string {
   // Use different strategies based on the number of available items
   if (availableItems.length === 1) {
     return availableItems[0];

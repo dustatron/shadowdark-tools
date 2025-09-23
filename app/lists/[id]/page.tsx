@@ -1,13 +1,10 @@
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Edit2, Plus, Dice6, Share } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { ArrowLeft, Dice6 } from "lucide-react";
 import { AuthButton } from "@/components/auth-button";
 import { ThemeSwitcher } from "@/components/theme-switcher";
 import { ListContent } from "@/components/lists/list-content";
-import { AddItemToListDialog } from "@/components/lists/add-item-to-list-dialog";
 
 interface PageProps {
   params: { id: string };
@@ -19,7 +16,7 @@ async function getList(id: string) {
     // In a real app, this would fetch from your API with server-side auth
     // For now, we'll handle this client-side in the ListContent component
     return { id, exists: true };
-  } catch (error) {
+  } catch {
     return null;
   }
 }

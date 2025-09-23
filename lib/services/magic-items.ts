@@ -28,7 +28,17 @@ const rarityKeywords: Record<MagicItemRarity, string[]> = {
   unknown: []
 };
 
-function inferItemType(item: any): MagicItemType {
+interface RawMagicItem {
+  name: string;
+  slug: string;
+  description: string;
+  traits?: Array<{
+    name: string;
+    description: string;
+  }>;
+}
+
+function inferItemType(item: RawMagicItem): MagicItemType {
   const searchText = `${item.name} ${item.description}`.toLowerCase();
 
   for (const [type, keywords] of Object.entries(typeKeywords)) {
@@ -41,7 +51,7 @@ function inferItemType(item: any): MagicItemType {
   return 'unknown';
 }
 
-function inferItemRarity(item: any): MagicItemRarity {
+function inferItemRarity(item: RawMagicItem): MagicItemRarity {
   const searchText = `${item.name} ${item.description}`.toLowerCase();
 
   for (const [rarity, keywords] of Object.entries(rarityKeywords)) {
@@ -59,7 +69,7 @@ function processMagicItems(): MagicItem[] {
     return processedMagicItems;
   }
 
-  processedMagicItems = (magicItemsData as any[]).map((item) => ({
+  processedMagicItems = (magicItemsData as RawMagicItem[]).map((item) => ({
     name: item.name,
     slug: item.slug,
     description: item.description,

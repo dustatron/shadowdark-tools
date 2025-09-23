@@ -7,17 +7,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import {
-  GripVertical,
   X,
   Search,
   Plus,
   Package,
   AlertCircle,
-  ArrowUpDown,
   ChevronUp,
   ChevronDown,
 } from "lucide-react";
-import { MagicItem, MagicItemWithMetadata } from "@/types/magic-items";
+import { MagicItem } from "@/types/magic-items";
 import { ListWithItems, ListItem } from "@/types/api";
 
 interface ListItemManagerProps {

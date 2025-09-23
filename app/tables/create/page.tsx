@@ -1,7 +1,6 @@
 import { Suspense } from "react";
 import Link from "next/link";
-import { ArrowLeft, Dice6, Plus } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { ArrowLeft, Dice6 } from "lucide-react";
 import { AuthButton } from "@/components/auth-button";
 import { ThemeSwitcher } from "@/components/theme-switcher";
 import { CreateTableForm } from "@/components/tables/create-table-form";

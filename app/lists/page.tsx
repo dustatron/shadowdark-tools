@@ -1,9 +1,8 @@
 import { Suspense } from "react";
 import Link from "next/link";
-import { Plus, Dice6, List as ListIcon, Calendar, Eye } from "lucide-react";
+import { Plus, Dice6 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { AuthButton } from "@/components/auth-button";
 import { ThemeSwitcher } from "@/components/theme-switcher";
 import { UserListsContent } from "@/components/lists/user-lists-content";
