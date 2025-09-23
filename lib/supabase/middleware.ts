@@ -2,6 +2,70 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { hasEnvVars } from "../utils";
 
+/**
+ * Define route patterns for different authentication requirements
+ */
+const PUBLIC_ROUTES = [
+  "/",
+  "/api/magic-items", // Magic item browsing API
+];
+
+const AUTH_ROUTES = [
+  "/auth/login",
+  "/auth/sign-up",
+  "/auth/sign-up-success",
+  "/auth/forgot-password",
+  "/auth/update-password",
+  "/auth/error",
+  "/auth/confirm",
+];
+
+const PROTECTED_ROUTES = [
+  "/lists",
+  "/tables",
+  "/profile",
+  "/protected",
+  "/api/lists",
+  "/api/favorites",
+  "/api/roll-tables",
+];
+
+const SHARED_CONTENT_ROUTES = [
+  "/shared", // Shared roll tables
+];
+
+/**
+ * Check if a path matches any pattern in the given routes array
+ */
+function matchesRoute(pathname: string, routes: string[]): boolean {
+  return routes.some(route => {
+    if (route.endsWith("*")) {
+      return pathname.startsWith(route.slice(0, -1));
+    }
+    return pathname === route || pathname.startsWith(route + "/");
+  });
+}
+
+/**
+ * Determine if a route requires authentication
+ */
+function requiresAuthentication(pathname: string): boolean {
+  // Public routes and shared content don't require auth
+  if (matchesRoute(pathname, PUBLIC_ROUTES) ||
+      matchesRoute(pathname, SHARED_CONTENT_ROUTES) ||
+      matchesRoute(pathname, AUTH_ROUTES)) {
+    return false;
+  }
+
+  // Protected routes require auth
+  if (matchesRoute(pathname, PROTECTED_ROUTES)) {
+    return true;
+  }
+
+  // Default: require authentication for unknown routes
+  return true;
+}
+
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
     request,
@@ -47,16 +111,28 @@ export async function updateSession(request: NextRequest) {
   const { data } = await supabase.auth.getClaims();
   const user = data?.claims;
 
-  if (
-    request.nextUrl.pathname !== "/" &&
-    !user &&
-    !request.nextUrl.pathname.startsWith("/login") &&
-    !request.nextUrl.pathname.startsWith("/auth")
-  ) {
-    // no user, potentially respond by redirecting the user to the login page
+  const pathname = request.nextUrl.pathname;
+
+  // Check if current route requires authentication
+  if (requiresAuthentication(pathname) && !user) {
+    // Redirect unauthenticated users to login page
     const url = request.nextUrl.clone();
     url.pathname = "/auth/login";
+    url.searchParams.set("redirectTo", pathname);
     return NextResponse.redirect(url);
+  }
+
+  // Redirect authenticated users away from auth pages to home
+  if (user && matchesRoute(pathname, AUTH_ROUTES) && pathname !== "/auth/confirm") {
+    const url = request.nextUrl.clone();
+    url.pathname = "/";
+    return NextResponse.redirect(url);
+  }
+
+  // Add user context to headers for SSR components
+  if (user) {
+    supabaseResponse.headers.set("x-user-id", user.sub);
+    supabaseResponse.headers.set("x-user-email", user.email || "");
   }
 
   // IMPORTANT: You *must* return the supabaseResponse object as it is.

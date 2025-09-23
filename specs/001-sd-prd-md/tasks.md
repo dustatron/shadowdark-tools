@@ -47,88 +47,88 @@ Next.js App Router structure (web application):
 ## Phase 3.1: Setup & Infrastructure
 
 - [x] T001 Initialize Next.js 15 project with TypeScript and required dependencies
-- [ ] T002 [P] Configure ESLint, Prettier, and TypeScript strict mode per constitutional requirements
-- [ ] T003 [P] Setup Tailwind CSS with shadcn/ui component system and theme configuration
-- [ ] T004 [P] Initialize Supabase project and configure local development environment
-- [ ] T005 Create database schema with migrations from data-model.md in supabase/migrations/
-- [ ] T006 [P] Setup Supabase TypeScript code generation and configure build scripts
-- [ ] T007 [P] Configure Jest and React Testing Library for component testing
-- [ ] T008 [P] Setup Playwright for end-to-end testing with authentication flows
+- [x] T002 [P] Configure ESLint, Prettier, and TypeScript strict mode per constitutional requirements
+- [x] T003 [P] Setup Tailwind CSS with shadcn/ui component system and theme configuration
+- [x] T004 [P] Initialize Supabase project and configure local development environment
+- [x] T005 Create database schema with migrations from data-model.md in supabase/migrations/
+- [x] T006 [P] Setup Supabase TypeScript code generation and configure build scripts
+- [x] T007 [P] Configure Jest and React Testing Library for component testing
+- [x] T008 [P] Setup Playwright for end-to-end testing with authentication flows
 
 ## Phase 3.2: TypeScript Types & Data Layer (TDD) ⚠️ MUST COMPLETE BEFORE 3.3
 
 **CRITICAL: These types and tests MUST be written and MUST FAIL before ANY implementation**
 
-- [ ] T009 [P] Generate TypeScript types from Supabase schema in types/database.ts
-- [ ] T010 [P] Create magic item type definitions in types/magic-items.ts
-- [ ] T011 [P] Create roll table data types in types/tables.ts
-- [ ] T012 [P] Create API response types in types/api.ts
-- [ ] T013 [P] Contract test GET /api/magic-items in tests/contract/magic-items-get.test.ts
-- [ ] T014 [P] Contract test GET /api/magic-items/{id} in tests/contract/magic-items-by-id.test.ts
-- [ ] T015 [P] Contract test GET /api/lists in tests/contract/lists-get.test.ts
-- [ ] T016 [P] Contract test POST /api/lists in tests/contract/lists-post.test.ts
-- [ ] T017 [P] Contract test PUT /api/lists/{id} in tests/contract/lists-put.test.ts
-- [ ] T018 [P] Contract test DELETE /api/lists/{id} in tests/contract/lists-delete.test.ts
-- [ ] T019 [P] Contract test POST /api/lists/{id}/items in tests/contract/list-items-post.test.ts
-- [ ] T020 [P] Contract test DELETE /api/lists/{id}/items in tests/contract/list-items-delete.test.ts
-- [ ] T021 [P] Contract test GET /api/favorites in tests/contract/favorites-get.test.ts
-- [ ] T022 [P] Contract test POST /api/favorites in tests/contract/favorites-post.test.ts
-- [ ] T023 [P] Contract test DELETE /api/favorites in tests/contract/favorites-delete.test.ts
-- [ ] T024 [P] Contract test GET /api/roll-tables in tests/contract/roll-tables-get.test.ts
-- [ ] T025 [P] Contract test POST /api/roll-tables in tests/contract/roll-tables-post.test.ts
-- [ ] T026 [P] Contract test PUT /api/roll-tables/{id} in tests/contract/roll-tables-put.test.ts
-- [ ] T027 [P] Contract test DELETE /api/roll-tables/{id} in tests/contract/roll-tables-delete.test.ts
-- [ ] T028 [P] Contract test GET /api/roll-tables/shared/{token} in tests/contract/shared-tables.test.ts
+- [x] T009 [P] Generate TypeScript types from Supabase schema in types/database.ts
+- [x] T010 [P] Create magic item type definitions in types/magic-items.ts
+- [x] T011 [P] Create roll table data types in types/tables.ts
+- [x] T012 [P] Create API response types in types/api.ts
+- [x] T013 [P] Contract test GET /api/magic-items in tests/contract/magic-items-get.test.ts
+- [x] T014 [P] Contract test GET /api/magic-items/{id} in tests/contract/magic-items-by-id.test.ts
+- [x] T015 [P] Contract test GET /api/lists in tests/contract/lists-get.test.ts
+- [x] T016 [P] Contract test POST /api/lists in tests/contract/lists-post.test.ts
+- [x] T017 [P] Contract test PUT /api/lists/{id} in tests/contract/lists-put.test.ts
+- [x] T018 [P] Contract test DELETE /api/lists/{id} in tests/contract/lists-delete.test.ts
+- [x] T019 [P] Contract test POST /api/lists/{id}/items in tests/contract/list-items-post.test.ts
+- [x] T020 [P] Contract test DELETE /api/lists/{id}/items in tests/contract/list-items-delete.test.ts
+- [x] T021 [P] Contract test GET /api/favorites in tests/contract/favorites-get.test.ts
+- [x] T022 [P] Contract test POST /api/favorites in tests/contract/favorites-post.test.ts
+- [x] T023 [P] Contract test DELETE /api/favorites in tests/contract/favorites-delete.test.ts
+- [x] T024 [P] Contract test GET /api/roll-tables in tests/contract/roll-tables-get.test.ts
+- [x] T025 [P] Contract test POST /api/roll-tables in tests/contract/roll-tables-post.test.ts
+- [x] T026 [P] Contract test PUT /api/roll-tables/{id} in tests/contract/roll-tables-put.test.ts
+- [x] T027 [P] Contract test DELETE /api/roll-tables/{id} in tests/contract/roll-tables-delete.test.ts
+- [x] T028 [P] Contract test GET /api/roll-tables/shared/{token} in tests/contract/shared-tables.test.ts
 
 ## Phase 3.3: Core Implementation (ONLY after tests are failing)
 
 ### Authentication & Database Foundation
-- [ ] T029 Create Supabase client configurations in lib/supabase/client.ts and lib/supabase/server.ts
-- [ ] T030 Implement authentication middleware in middleware.ts for protected routes
-- [ ] T031 [P] Create magic items service with JSON data loading in lib/services/magic-items.ts
-- [ ] T032 [P] Create database service layer for lists in lib/services/lists.ts
-- [ ] T033 [P] Create database service layer for favorites in lib/services/favorites.ts
-- [ ] T034 [P] Create database service layer for roll tables in lib/services/roll-tables.ts
+- [x] T029 Create Supabase client configurations in lib/supabase/client.ts and lib/supabase/server.ts
+- [x] T030 Implement authentication middleware in middleware.ts for protected routes
+- [x] T031 [P] Create magic items service with JSON data loading in lib/services/magic-items.ts
+- [x] T032 [P] Create database service layer for lists in lib/services/lists.ts
+- [x] T033 [P] Create database service layer for favorites in lib/services/favorites.ts
+- [x] T034 [P] Create database service layer for roll tables in lib/services/roll-tables.ts
 
 ### API Endpoints Implementation
-- [ ] T035 Implement GET /api/magic-items with search and filtering in app/api/magic-items/route.ts
-- [ ] T036 Implement GET /api/magic-items/[id] in app/api/magic-items/[id]/route.ts
-- [ ] T037 Implement lists CRUD endpoints in app/api/lists/route.ts and app/api/lists/[id]/route.ts
-- [ ] T038 Implement list items endpoints in app/api/lists/[id]/items/route.ts
-- [ ] T039 Implement favorites endpoints in app/api/favorites/route.ts
-- [ ] T040 Implement roll tables CRUD endpoints in app/api/roll-tables/route.ts and app/api/roll-tables/[id]/route.ts
+- [x] T035 Implement GET /api/magic-items with search and filtering in app/api/magic-items/route.ts
+- [x] T036 Implement GET /api/magic-items/[id] in app/api/magic-items/[id]/route.ts
+- [x] T037 Implement lists CRUD endpoints in app/api/lists/route.ts and app/api/lists/[id]/route.ts
+- [x] T038 Implement list items endpoints in app/api/lists/[id]/items/route.ts
+- [x] T039 Implement favorites endpoints in app/api/favorites/route.ts
+- [x] T040 Implement roll tables CRUD endpoints in app/api/roll-tables/route.ts and app/api/roll-tables/[id]/route.ts
 
 ## Phase 3.4: Frontend Components & Pages
 
 ### Core UI Components (shadcn/ui based)
-- [ ] T041 [P] Create MagicItemCard component in components/magic-item/magic-item-card.tsx
-- [ ] T042 [P] Create SearchBar component with fuzzy search in components/search/search-bar.tsx
-- [ ] T043 [P] Create FilterControls component in components/filters/filter-controls.tsx
-- [ ] T044 [P] Create ListCard component in components/lists/list-card.tsx
-- [ ] T045 [P] Create ListItemManager component in components/lists/list-item-manager.tsx
-- [ ] T046 [P] Create RollTableDisplay component in components/tables/roll-table-display.tsx
-- [ ] T047 [P] Create RollTableGenerator component in components/tables/roll-table-generator.tsx
-- [ ] T048 [P] Create AuthButton component in components/auth/auth-button.tsx
+- [x] T041 [P] Create MagicItemCard component in components/magic-item/magic-item-card.tsx
+- [x] T042 [P] Create SearchBar component with fuzzy search in components/search/search-bar.tsx
+- [x] T043 [P] Create FilterControls component in components/filters/filter-controls.tsx
+- [x] T044 [P] Create ListCard component in components/lists/list-card.tsx
+- [x] T045 [P] Create ListItemManager component in components/lists/list-item-manager.tsx
+- [x] T046 [P] Create RollTableDisplay component in components/tables/roll-table-display.tsx
+- [x] T047 [P] Create RollTableGenerator component in components/tables/roll-table-generator.tsx
+- [x] T048 [P] Create AuthButton component in components/auth/auth-button.tsx
 
 ### Page Implementation
-- [ ] T049 Create homepage with magic item browsing in app/page.tsx
-- [ ] T050 Create magic item detail page in app/items/[id]/page.tsx
-- [ ] T051 Create user lists page in app/lists/page.tsx
-- [ ] T052 Create individual list view in app/lists/[id]/page.tsx
-- [ ] T053 Create roll table creation page in app/tables/create/page.tsx
-- [ ] T054 Create roll table view page in app/tables/[id]/page.tsx
-- [ ] T055 Create shared roll table page in app/shared/[token]/page.tsx
-- [ ] T056 Create authentication pages in app/(auth)/login/page.tsx and app/(auth)/register/page.tsx
+- [x] T049 Create homepage with magic item browsing in app/page.tsx
+- [x] T050 Create magic item detail page in app/items/[id]/page.tsx
+- [x] T051 Create user lists page in app/lists/page.tsx
+- [x] T052 Create individual list view in app/lists/[id]/page.tsx
+- [x] T053 Create roll table creation page in app/tables/create/page.tsx
+- [x] T054 Create roll table view page in app/tables/[id]/page.tsx
+- [x] T055 Create shared roll table page in app/shared/[token]/page.tsx
+- [x] T056 Create authentication pages in app/(auth)/login/page.tsx and app/(auth)/register/page.tsx
 
 ## Phase 3.5: State Management & Advanced Features
 
-- [ ] T057 [P] Create Zustand store for UI state in lib/stores/ui-store.ts
-- [ ] T058 [P] Create Zustand store for search state in lib/stores/search-store.ts
-- [ ] T059 [P] Implement fuzzy search with Fuse.js in lib/utils/search.ts
-- [ ] T060 [P] Create roll table generation algorithms in lib/utils/roll-table-generator.ts
-- [ ] T061 [P] Implement share token generation and validation in lib/utils/sharing.ts
-- [ ] T062 Create responsive navigation layout in components/layout/navigation.tsx
-- [ ] T063 Implement theme switching with next-themes in components/layout/theme-toggle.tsx
+- [x] T057 [P] Create Zustand store for UI state in lib/stores/ui-store.ts
+- [x] T058 [P] Create Zustand store for search state in lib/stores/search-store.ts
+- [x] T059 [P] Implement fuzzy search with Fuse.js in lib/utils/search.ts
+- [x] T060 [P] Create roll table generation algorithms in lib/utils/roll-table-generator.ts
+- [x] T061 [P] Implement share token generation and validation in lib/utils/sharing.ts
+- [x] T062 Create responsive navigation layout in components/layout/navigation.tsx
+- [x] T063 Implement theme switching with next-themes in components/layout/theme-toggle.tsx
 
 ## Phase 3.6: Integration Testing
 
