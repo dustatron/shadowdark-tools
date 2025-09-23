@@ -1,0 +1,874 @@
+openapi: 3.0.3
+info:
+  title: Shadowdark Magic Item Web App API
+  description: RESTful API for managing magic items, lists, and roll tables
+  version: 1.0.0
+  contact:
+    name: Shadowdark Tools
+    email: support@shadowdark-tools.com
+
+servers:
+  - url: https://localhost:3000/api
+    description: Development server
+  - url: https://shadowdark-tools.vercel.app/api
+    description: Production server
+
+security:
+  - BearerAuth: []
+
+paths:
+  /magic-items:
+    get:
+      summary: Get all magic items
+      description: Retrieve all Shadowdark magic items (public endpoint)
+      security: []
+      parameters:
+        - name: search
+          in: query
+          description: Fuzzy search query across all fields
+          required: false
+          schema:
+            type: string
+            maxLength: 100
+        - name: type
+          in: query
+          description: Filter by item type
+          required: false
+          schema:
+            type: string
+            enum: [weapon, armor, accessory, consumable, artifact]
+        - name: rarity
+          in: query
+          description: Filter by rarity
+          required: false
+          schema:
+            type: string
+            enum: [common, uncommon, rare, very-rare, legendary, artifact]
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/MagicItem'
+                  total:
+                    type: integer
+                    example: 500
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /magic-items/{id}:
+    get:
+      summary: Get magic item by ID
+      description: Retrieve a specific magic item by ID (public endpoint)
+      security: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Magic item identifier
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/MagicItem'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /lists:
+    get:
+      summary: Get user's lists
+      description: Retrieve all lists for authenticated user
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/List'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+    post:
+      summary: Create a new list
+      description: Create a new magic item list for authenticated user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+              properties:
+                name:
+                  type: string
+                  maxLength: 100
+                  example: "My Campaign Items"
+                description:
+                  type: string
+                  maxLength: 500
+                  example: "Magic items for the Tomb of Annihilation campaign"
+      responses:
+        '201':
+          description: List created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/List'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          description: List limit exceeded or name conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error: "Conflict"
+                message: "Max allowed is 100"
+
+  /lists/{id}:
+    get:
+      summary: Get list by ID
+      description: Retrieve specific list with items
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: List identifier
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    allOf:
+                      - $ref: '#/components/schemas/List'
+                      - type: object
+                        properties:
+                          items:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/ListItem'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      summary: Update list
+      description: Update list name and description
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  maxLength: 100
+                description:
+                  type: string
+                  maxLength: 500
+      responses:
+        '200':
+          description: List updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/List'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      summary: Delete list
+      description: Delete a list and all its items
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: List deleted successfully
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /lists/{id}/items:
+    post:
+      summary: Add item to list
+      description: Add a magic item to the specified list
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - magicItemId
+              properties:
+                magicItemId:
+                  type: string
+                  example: "ring-of-protection"
+      responses:
+        '201':
+          description: Item added to list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ListItem'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: Item already in list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    delete:
+      summary: Remove item from list
+      description: Remove a magic item from the specified list
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: magicItemId
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Item removed from list
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /favorites:
+    get:
+      summary: Get user's favorites
+      description: Retrieve all favorited magic items for authenticated user
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Favorite'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+    post:
+      summary: Add to favorites
+      description: Add a magic item to user's favorites
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - magicItemId
+              properties:
+                magicItemId:
+                  type: string
+                  example: "sword-of-flame"
+      responses:
+        '201':
+          description: Item added to favorites
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Favorite'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          description: Item already favorited
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    delete:
+      summary: Remove from favorites
+      description: Remove a magic item from user's favorites
+      parameters:
+        - name: magicItemId
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Item removed from favorites
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /roll-tables:
+    get:
+      summary: Get user's roll tables
+      description: Retrieve all roll tables for authenticated user
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/RollTable'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+    post:
+      summary: Create roll table
+      description: Create a new roll table from a list or custom data
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - dieSize
+                - tableData
+              properties:
+                name:
+                  type: string
+                  maxLength: 100
+                  example: "Treasure Table d20"
+                dieSize:
+                  type: integer
+                  minimum: 1
+                  maximum: 10000
+                  example: 20
+                sourceListId:
+                  type: string
+                  format: uuid
+                  nullable: true
+                tableData:
+                  $ref: '#/components/schemas/RollTableData'
+      responses:
+        '201':
+          description: Roll table created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/RollTable'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /roll-tables/{id}:
+    get:
+      summary: Get roll table by ID
+      description: Retrieve specific roll table (can be accessed via share token)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Roll table identifier
+          schema:
+            type: string
+            format: uuid
+        - name: token
+          in: query
+          description: Share token for public access
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/RollTable'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      summary: Update roll table
+      description: Update roll table data and metadata
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  maxLength: 100
+                dieSize:
+                  type: integer
+                  minimum: 1
+                  maximum: 10000
+                tableData:
+                  $ref: '#/components/schemas/RollTableData'
+      responses:
+        '200':
+          description: Roll table updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/RollTable'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      summary: Delete roll table
+      description: Delete a roll table
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Roll table deleted successfully
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /roll-tables/shared/{token}:
+    get:
+      summary: Get shared roll table
+      description: Retrieve roll table by share token (public endpoint)
+      security: []
+      parameters:
+        - name: token
+          in: path
+          required: true
+          description: Share token
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/RollTable'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Supabase JWT token
+
+  schemas:
+    MagicItem:
+      type: object
+      required:
+        - id
+        - name
+        - description
+        - type
+        - rarity
+      properties:
+        id:
+          type: string
+          example: "ring-of-protection"
+        name:
+          type: string
+          example: "Ring of Protection"
+        description:
+          type: string
+          example: "This ring grants a +1 bonus to AC and saving throws."
+        type:
+          type: string
+          enum: [weapon, armor, accessory, consumable, artifact]
+          example: "accessory"
+        rarity:
+          type: string
+          enum: [common, uncommon, rare, very-rare, legendary, artifact]
+          example: "uncommon"
+        properties:
+          type: object
+          additionalProperties: true
+          example:
+            attunement: true
+            charges: null
+        source:
+          type: string
+          example: "Core Rules"
+
+    List:
+      type: object
+      required:
+        - id
+        - userId
+        - name
+        - isFavoriteList
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        userId:
+          type: string
+          format: uuid
+          example: "987fcdeb-51a2-43d1-9c45-123456789abc"
+        name:
+          type: string
+          maxLength: 100
+          example: "Campaign Magic Items"
+        description:
+          type: string
+          maxLength: 500
+          nullable: true
+          example: "Items found during our current campaign"
+        isFavoriteList:
+          type: boolean
+          example: false
+        createdAt:
+          type: string
+          format: date-time
+          example: "2025-01-23T10:30:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          example: "2025-01-23T10:30:00Z"
+
+    ListItem:
+      type: object
+      required:
+        - id
+        - listId
+        - magicItemId
+        - sortOrder
+        - addedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "456e7890-e12b-34d5-a678-901234567890"
+        listId:
+          type: string
+          format: uuid
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        magicItemId:
+          type: string
+          example: "sword-of-flame"
+        sortOrder:
+          type: integer
+          example: 1
+        addedAt:
+          type: string
+          format: date-time
+          example: "2025-01-23T10:30:00Z"
+        magicItem:
+          $ref: '#/components/schemas/MagicItem'
+
+    Favorite:
+      type: object
+      required:
+        - id
+        - userId
+        - magicItemId
+        - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "789e0123-e45f-67g8-a901-234567890123"
+        userId:
+          type: string
+          format: uuid
+          example: "987fcdeb-51a2-43d1-9c45-123456789abc"
+        magicItemId:
+          type: string
+          example: "ring-of-protection"
+        createdAt:
+          type: string
+          format: date-time
+          example: "2025-01-23T10:30:00Z"
+        magicItem:
+          $ref: '#/components/schemas/MagicItem'
+
+    RollTable:
+      type: object
+      required:
+        - id
+        - name
+        - dieSize
+        - shareToken
+        - tableData
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "abc12345-def6-7890-abcd-ef1234567890"
+        userId:
+          type: string
+          format: uuid
+          nullable: true
+          example: "987fcdeb-51a2-43d1-9c45-123456789abc"
+        sourceListId:
+          type: string
+          format: uuid
+          nullable: true
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        name:
+          type: string
+          maxLength: 100
+          example: "Treasure Table d20"
+        dieSize:
+          type: integer
+          minimum: 1
+          maximum: 10000
+          example: 20
+        shareToken:
+          type: string
+          example: "8a9b2c3d4e5f6789"
+        isPublic:
+          type: boolean
+          example: false
+        tableData:
+          $ref: '#/components/schemas/RollTableData'
+        createdAt:
+          type: string
+          format: date-time
+          example: "2025-01-23T10:30:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          example: "2025-01-23T10:30:00Z"
+
+    RollTableData:
+      type: object
+      required:
+        - rolls
+        - metadata
+      properties:
+        rolls:
+          type: array
+          items:
+            type: object
+            required:
+              - roll
+            properties:
+              roll:
+                type: integer
+                minimum: 1
+                example: 1
+              magicItemId:
+                type: string
+                nullable: true
+                example: "sword-of-flame"
+              customText:
+                type: string
+                nullable: true
+                example: "Custom treasure description"
+        metadata:
+          type: object
+          required:
+            - generatedAt
+            - fillStrategy
+          properties:
+            generatedAt:
+              type: string
+              format: date-time
+              example: "2025-01-23T10:30:00Z"
+            sourceListName:
+              type: string
+              nullable: true
+              example: "Campaign Magic Items"
+            fillStrategy:
+              type: string
+              enum: [auto, manual, blank]
+              example: "auto"
+
+    Error:
+      type: object
+      required:
+        - error
+        - message
+      properties:
+        error:
+          type: string
+          example: "Bad Request"
+        message:
+          type: string
+          example: "Validation failed"
+        details:
+          type: object
+          additionalProperties: true
+
+  responses:
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: "Bad Request"
+            message: "Invalid input data"
+
+    Unauthorized:
+      description: Authentication required
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: "Unauthorized"
+            message: "Authentication required"
+
+    Forbidden:
+      description: Access denied
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: "Forbidden"
+            message: "Access denied"
+
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: "Not Found"
+            message: "Resource not found"
