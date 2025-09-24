@@ -191,6 +191,36 @@ export type Database = {
           }
         ]
       }
+      magic_items: {
+        Row: {
+          id: string
+          name: string
+          slug: string
+          description: string
+          traits: Json
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id: string
+          name: string
+          slug: string
+          description: string
+          traits?: Json
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          name?: string
+          slug?: string
+          description?: string
+          traits?: Json
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

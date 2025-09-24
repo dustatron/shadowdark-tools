@@ -8,6 +8,9 @@
     "test": "jest",
     "db:up": "supabase db push",
     "db:login": "supabase login",
+    "db:link": "supabase link",
+    "seed:magic-items": "tsx scripts/seed-magic-items.ts",
+    "seed:magic-items:db": "tsx scripts/seed-magic-items.ts --format=db",
     "test:watch": "jest --watch",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui"
@@ -52,6 +55,7 @@
     "supabase": "^2.45.5",
     "tailwindcss": "^3.4.1",
     "tailwindcss-animate": "^1.0.7",
+    "tsx": "^4.20.5",
     "typescript": "^5"
   }
 }

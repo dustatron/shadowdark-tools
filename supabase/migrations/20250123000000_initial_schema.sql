@@ -1,5 +1,4 @@
--- Enable Row Level Security
-ALTER DATABASE SET row_security = on;
+-- Row Level Security will be enabled per table later in this migration
 
 -- Users table (extends Supabase auth.users)
 CREATE TABLE public.users (

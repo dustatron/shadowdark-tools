@@ -1,8 +1,6 @@
 import { MagicItem, MagicItemSearchFilters, MagicItemSearchResult, MagicItemType, MagicItemRarity } from '@/types/magic-items';
+import { createClient } from '@/lib/supabase/server';
 import Fuse from 'fuse.js';
-
-// Import the JSON data
-import magicItemsData from '@/magic-items-list.json';
 
 // Cache for processed magic items
 let processedMagicItems: MagicItem[] | null = null;
@@ -64,16 +62,29 @@ function inferItemRarity(item: RawMagicItem): MagicItemRarity {
   return 'unknown';
 }
 
-function processMagicItems(): MagicItem[] {
+async function loadMagicItemsFromDatabase(): Promise<MagicItem[]> {
   if (processedMagicItems) {
     return processedMagicItems;
   }
 
-  processedMagicItems = (magicItemsData as RawMagicItem[]).map((item) => ({
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from('magic_items')
+    .select('*')
+    .order('name');
+
+  if (error) {
+    console.error('Error fetching magic items from database:', error);
+    throw new Error('Failed to load magic items');
+  }
+
+  processedMagicItems = data.map((item) => ({
     name: item.name,
     slug: item.slug,
     description: item.description,
     traits: item.traits || [],
+    // Since we stored the raw data, we still need to infer type/rarity
     type: inferItemType(item),
     rarity: inferItemRarity(item),
   }));
@@ -81,9 +92,9 @@ function processMagicItems(): MagicItem[] {
   return processedMagicItems;
 }
 
-function getFuseInstance(): Fuse<MagicItem> {
+async function getFuseInstance(): Promise<Fuse<MagicItem>> {
   if (!fuseInstance) {
-    const items = processMagicItems();
+    const items = await loadMagicItemsFromDatabase();
     fuseInstance = new Fuse(items, {
       keys: [
         { name: 'name', weight: 0.4 },
@@ -99,20 +110,20 @@ function getFuseInstance(): Fuse<MagicItem> {
 }
 
 export async function getAllMagicItems(): Promise<MagicItem[]> {
-  return processMagicItems();
+  return loadMagicItemsFromDatabase();
 }
 
 export async function getMagicItemBySlug(slug: string): Promise<MagicItem | null> {
-  const items = processMagicItems();
+  const items = await loadMagicItemsFromDatabase();
   return items.find(item => item.slug === slug) || null;
 }
 
 export async function searchMagicItems(filters: MagicItemSearchFilters = {}): Promise<MagicItemSearchResult> {
-  let items = processMagicItems();
+  let items = await loadMagicItemsFromDatabase();
 
   // Apply search
   if (filters.search) {
-    const fuse = getFuseInstance();
+    const fuse = await getFuseInstance();
     const results = fuse.search(filters.search);
     items = results.map(result => result.item);
   }
@@ -134,6 +145,6 @@ export async function searchMagicItems(filters: MagicItemSearchFilters = {}): Pr
 }
 
 export async function getMagicItemsByIds(slugs: string[]): Promise<MagicItem[]> {
-  const items = processMagicItems();
+  const items = await loadMagicItemsFromDatabase();
   return items.filter(item => slugs.includes(item.slug));
 }
