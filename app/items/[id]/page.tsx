@@ -12,7 +12,7 @@ import { getMagicItemBySlug } from "@/lib/services/magic-items";
 import { MagicItemType, MagicItemRarity } from "@/types/magic-items";
 
 interface PageProps {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 const typeLabels: Record<MagicItemType, string> = {
@@ -45,7 +45,8 @@ const rarityColors: Record<MagicItemRarity, string> = {
 };
 
 export async function generateMetadata({ params }: PageProps) {
-  const item = await getMagicItemBySlug(params.id);
+  const { id } = await params;
+  const item = await getMagicItemBySlug(id);
 
   if (!item) {
     return {
@@ -60,7 +61,8 @@ export async function generateMetadata({ params }: PageProps) {
 }
 
 export default async function MagicItemPage({ params }: PageProps) {
-  const item = await getMagicItemBySlug(params.id);
+  const { id } = await params;
+  const item = await getMagicItemBySlug(id);
 
   if (!item) {
     notFound();

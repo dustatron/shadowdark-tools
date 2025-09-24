@@ -44,7 +44,7 @@ export function UserListsContent() {
       if (!response.ok) throw new Error("Failed to fetch lists");
 
       const data = await response.json();
-      setLists(data);
+      setLists(Array.isArray(data) ? data : data.data || []);
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
     } finally {

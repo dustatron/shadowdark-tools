@@ -70,8 +70,8 @@ export function CreateTableForm() {
       setListsLoading(true);
       const response = await fetch("/api/lists");
       if (response.ok) {
-        const lists = await response.json();
-        setUserLists(lists);
+        const data = await response.json();
+        setUserLists(Array.isArray(data) ? data : data.data || []);
       }
     } catch (error) {
       console.error("Error fetching user lists:", error);

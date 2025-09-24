@@ -16,12 +16,6 @@ export function FavoriteButton({ itemSlug }: FavoriteButtonProps) {
   const { user } = useAuth();
   const router = useRouter();
 
-  useEffect(() => {
-    if (user) {
-      checkFavoriteStatus();
-    }
-  }, [user, itemSlug, checkFavoriteStatus]);
-
   const checkFavoriteStatus = useCallback(async () => {
     if (!user) return;
 
@@ -35,6 +29,12 @@ export function FavoriteButton({ itemSlug }: FavoriteButtonProps) {
       console.error("Error checking favorite status:", error);
     }
   }, [user, itemSlug]);
+
+  useEffect(() => {
+    if (user) {
+      checkFavoriteStatus();
+    }
+  }, [user, itemSlug, checkFavoriteStatus]);
 
   const toggleFavorite = async () => {
     if (!user) {
