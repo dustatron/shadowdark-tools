@@ -34,9 +34,9 @@ export type MagicItemRarity =
   | 'unknown';
 
 export interface MagicItemSearchFilters {
-  search?: string;
-  type?: MagicItemType;
-  rarity?: MagicItemRarity;
+  search?: string | undefined;
+  type?: MagicItemType | undefined;
+  rarity?: MagicItemRarity | undefined;
 }
 
 export interface MagicItemSearchResult {

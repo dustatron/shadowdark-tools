@@ -20,7 +20,7 @@ export interface SearchState {
   // Search state
   isSearching: boolean;
   hasSearched: boolean;
-  searchError?: string;
+  searchError: string | undefined;
 
   // Recent searches
   recentSearches: string[];
@@ -210,7 +210,10 @@ export const useSearchStore = create<SearchState>()(
         const state = get();
         const startIndex = (state.currentPage - 1) * state.itemsPerPage;
         const endIndex = startIndex + state.itemsPerPage;
-        return state.results.slice(startIndex, endIndex);
+
+        // Ensure results is always an array
+        const results = Array.isArray(state.results) ? state.results : [];
+        return results.slice(startIndex, endIndex);
       },
 
       getActiveFiltersCount: () => {
@@ -243,6 +246,12 @@ export const useSearchStore = create<SearchState>()(
         sortBy: state.sortBy,
         sortOrder: state.sortOrder,
       }),
+      // Ensure proper initialization after rehydration
+      onRehydrateStorage: () => (state) => {
+        if (state && !Array.isArray(state.results)) {
+          state.results = [];
+        }
+      },
     }
   )
 );
@@ -259,21 +268,26 @@ export const useSearchFilters = () => {
     hasActiveFilters,
   } = useSearchStore();
 
-  const setType = (type?: MagicItemType) => setFilters({ type });
-  const setRarity = (rarity?: MagicItemRarity) => setFilters({ rarity });
-
   const toggleQuickFilter = (filterKey: keyof SearchState['quickFilters']) => {
     setQuickFilters({ [filterKey]: !quickFilters[filterKey] });
+  };
+
+  const setType = (type: MagicItemType | undefined) => {
+    setFilters({ type });
+  };
+
+  const setRarity = (rarity: MagicItemRarity | undefined) => {
+    setFilters({ rarity });
   };
 
   return {
     filters,
     quickFilters,
     setFilters,
-    setType,
-    setRarity,
     setQuickFilters,
     toggleQuickFilter,
+    setType,
+    setRarity,
     clearFilters,
     activeFiltersCount: getActiveFiltersCount(),
     hasActiveFilters: hasActiveFilters(),

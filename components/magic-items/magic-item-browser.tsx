@@ -1,48 +1,17 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { MagicItemType, MagicItemRarity } from "@/types/magic-items";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Search, Filter, Grid, List as ListIcon, ChevronDown } from "lucide-react";
+import { Search, Grid, List as ListIcon } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { useUIStore } from "@/lib/stores/ui-store";
 import { createSearchEngine, MagicItemSearchEngine } from "@/lib/utils/search";
-import { FavoriteButton } from "./favorite-button";
-import { AddToListButton } from "./add-to-list-button";
+import { useSearchResults, useSearchStore } from "@/lib/stores/search-store";
 
-const typeLabels: Record<MagicItemType, string> = {
-  weapon: "Weapons",
-  armor: "Armor",
-  accessory: "Accessories",
-  consumable: "Consumables",
-  artifact: "Artifacts",
-  unknown: "Unknown",
-};
-
-const rarityLabels: Record<MagicItemRarity, string> = {
-  common: "Common",
-  uncommon: "Uncommon",
-  rare: "Rare",
-  "very-rare": "Very Rare",
-  legendary: "Legendary",
-  artifact: "Artifact",
-  unknown: "Unknown",
-};
-
-const rarityColors: Record<MagicItemRarity, string> = {
-  common: "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200",
-  uncommon: "bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-200",
-  rare: "bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-200",
-  "very-rare": "bg-purple-100 text-purple-800 dark:bg-purple-800 dark:text-purple-200",
-  legendary: "bg-orange-100 text-orange-800 dark:bg-orange-800 dark:text-orange-200",
-  artifact: "bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-200",
-  unknown: "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200",
-};
 
 export function MagicItemBrowser() {
   const [searchEngine, setSearchEngine] = useState<MagicItemSearchEngine | null>(null);
@@ -54,25 +23,16 @@ export function MagicItemBrowser() {
   const {
     query,
     setQuery,
-    clearFilters,
     setResults,
     setSearching,
     setSearchError
   } = useSearchStore();
-  const {
-    filters: searchFilters,
-    setType,
-    setRarity,
-    hasActiveFilters,
-    activeFiltersCount
-  } = useSearchFilters();
   const {
     displayedItems,
     totalResults,
     currentPage,
     totalPages,
     isSearching,
-    hasSearched,
     searchError: storeSearchError,
     setCurrentPage
   } = useSearchResults();
@@ -86,8 +46,7 @@ export function MagicItemBrowser() {
         if (!response.ok) throw new Error("Failed to fetch items");
 
         const data = await response.json();
-        const items = data.data || [];
-        setAllItems(items);
+        const items = data.data?.data || [];
 
         // Initialize search engine
         const engine = createSearchEngine(items);
@@ -119,8 +78,6 @@ export function MagicItemBrowser() {
           query || undefined,
           {
             search: query || undefined,
-            type: searchFilters.type,
-            rarity: searchFilters.rarity,
           },
           {
             sortBy: 'relevance',
@@ -140,7 +97,7 @@ export function MagicItemBrowser() {
     // Debounce search
     const timeoutId = setTimeout(performSearchOperation, 300);
     return () => clearTimeout(timeoutId);
-  }, [query, searchFilters.type, searchFilters.rarity, searchEngine, loading, setResults, setSearching, setSearchError]);
+  }, [query, searchEngine, loading, setResults, setSearching, setSearchError]);
 
   if (loading) {
     return (
@@ -174,53 +131,6 @@ export function MagicItemBrowser() {
         </div>
 
         <div className="flex gap-2">
-          {/* Type Filter */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="gap-2">
-                <Filter className="h-4 w-4" />
-                {searchFilters.type ? typeLabels[searchFilters.type] : "All Types"}
-                <ChevronDown className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuItem onClick={() => setType(undefined)}>
-                All Types
-              </DropdownMenuItem>
-              {Object.entries(typeLabels).map(([type, label]) => (
-                <DropdownMenuItem
-                  key={type}
-                  onClick={() => setType(type as MagicItemType)}
-                >
-                  {label}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          {/* Rarity Filter */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="gap-2">
-                {searchFilters.rarity ? rarityLabels[searchFilters.rarity] : "All Rarities"}
-                <ChevronDown className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuItem onClick={() => setRarity(undefined)}>
-                All Rarities
-              </DropdownMenuItem>
-              {Object.entries(rarityLabels).map(([rarity, label]) => (
-                <DropdownMenuItem
-                  key={rarity}
-                  onClick={() => setRarity(rarity as MagicItemRarity)}
-                >
-                  {label}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-
           {/* View Mode Toggle */}
           <div className="flex border rounded-md">
             <Button
@@ -244,29 +154,15 @@ export function MagicItemBrowser() {
       </div>
 
       {/* Active Filters */}
-      {hasActiveFilters && (
+      {query && (
         <div className="flex items-center gap-2 flex-wrap">
           <span className="text-sm text-muted-foreground">Filters:</span>
-          {query && (
-            <Badge variant="secondary" className="gap-1">
-              Search: {query}
-              <button onClick={() => setQuery("")} className="ml-1 hover:text-destructive">×</button>
-            </Badge>
-          )}
-          {searchFilters.type && (
-            <Badge variant="secondary" className="gap-1">
-              Type: {typeLabels[searchFilters.type]}
-              <button onClick={() => setType(undefined)} className="ml-1 hover:text-destructive">×</button>
-            </Badge>
-          )}
-          {searchFilters.rarity && (
-            <Badge variant="secondary" className="gap-1">
-              Rarity: {rarityLabels[searchFilters.rarity]}
-              <button onClick={() => setRarity(undefined)} className="ml-1 hover:text-destructive">×</button>
-            </Badge>
-          )}
-          <Button variant="ghost" size="sm" onClick={clearFilters}>
-            Clear All
+          <Badge variant="secondary" className="gap-1">
+            Search: {query}
+            <button onClick={() => setQuery("")} className="ml-1 hover:text-destructive">×</button>
+          </Badge>
+          <Button variant="ghost" size="sm" onClick={() => setQuery("")}>
+            Clear Search
           </Button>
         </div>
       )}
@@ -282,9 +178,9 @@ export function MagicItemBrowser() {
           ) : (
             <>
               {totalResults} item{totalResults !== 1 ? "s" : ""} found
-              {activeFiltersCount > 0 && (
+              {query && (
                 <span className="ml-2 text-xs">
-                  ({activeFiltersCount} filter{activeFiltersCount !== 1 ? "s" : ""} active)
+                  (filtered by search)
                 </span>
               )}
             </>
@@ -298,16 +194,12 @@ export function MagicItemBrowser() {
       </div>
 
       {/* Items Grid/List */}
-      {!hasSearched && !loading ? (
-        <div className="text-center py-12">
-          <p className="text-muted-foreground">Start searching to find magic items.</p>
-        </div>
-      ) : totalResults === 0 ? (
+      {totalResults === 0 ? (
         <div className="text-center py-12">
           <p className="text-muted-foreground">No magic items found matching your criteria.</p>
-          {hasActiveFilters && (
-            <Button variant="outline" onClick={clearFilters} className="mt-4">
-              Clear Filters
+          {query && (
+            <Button variant="outline" onClick={() => setQuery("")} className="mt-4">
+              Clear Search
             </Button>
           )}
         </div>
@@ -323,19 +215,7 @@ export function MagicItemBrowser() {
                 <Link href={`/items/${item.slug}`}>
                   <Card className="h-full hover:shadow-md transition-shadow cursor-pointer">
                     <CardHeader className="pb-3">
-                      <div className="flex items-start justify-between gap-2">
-                        <CardTitle className="text-base leading-tight">{item.name}</CardTitle>
-                        {item.rarity !== "unknown" && (
-                          <Badge className={cn("text-xs", rarityColors[item.rarity])}>
-                            {rarityLabels[item.rarity]}
-                          </Badge>
-                        )}
-                      </div>
-                      {item.type !== "unknown" && (
-                        <Badge variant="outline" className="text-xs w-fit">
-                          {typeLabels[item.type]}
-                        </Badge>
-                      )}
+                      <CardTitle className="text-base leading-tight">{item.name}</CardTitle>
                     </CardHeader>
                     <CardContent className="pt-0">
                       <p className="text-sm text-muted-foreground line-clamp-3">
@@ -350,13 +230,7 @@ export function MagicItemBrowser() {
                   </Card>
                 </Link>
 
-                {/* Action buttons that appear on hover */}
-                <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity bg-background/80 backdrop-blur-sm rounded-md p-1 shadow-sm">
-                  <div className="flex gap-1">
-                    <FavoriteButton magicItemId={item.slug} size="sm" />
-                    <AddToListButton magicItemId={item.slug} size="sm" />
-                  </div>
-                </div>
+                {/* Action buttons temporarily disabled due to Supabase setup */}
               </div>
             ))}
           </div>

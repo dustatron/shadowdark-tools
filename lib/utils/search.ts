@@ -51,16 +51,16 @@ export class MagicItemSearchEngine {
   private allItems: MagicItem[];
 
   constructor(items: MagicItem[]) {
-    this.allItems = items;
-    this.fuse = new Fuse(items, fuseConfig);
+    this.allItems = Array.isArray(items) ? items : [];
+    this.fuse = new Fuse(this.allItems, fuseConfig);
   }
 
   /**
    * Update the search index with new items
    */
   updateItems(items: MagicItem[]) {
-    this.allItems = items;
-    this.fuse = new Fuse(items, fuseConfig);
+    this.allItems = Array.isArray(items) ? items : [];
+    this.fuse = new Fuse(this.allItems, fuseConfig);
   }
 
   /**
