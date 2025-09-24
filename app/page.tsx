@@ -1,11 +1,11 @@
-import { Suspense } from "react";
-import { AuthButton } from "@/components/auth-button";
-import { ThemeSwitcher } from "@/components/theme-switcher";
-import Link from "next/link";
-import { MagicItemBrowser } from "@/components/magic-items/magic-item-browser";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { BookOpen, List, Dice6 } from "lucide-react";
+import { Suspense } from 'react';
+import { AuthButton } from '@/components/auth-button';
+import { ThemeSwitcher } from '@/components/theme-switcher';
+import Link from 'next/link';
+import { MagicItemBrowser } from '@/components/magic-items/magic-item-browser';
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { BookOpen, List, Dice6 } from 'lucide-react';
 
 export default function Home() {
   return (
@@ -14,15 +14,24 @@ export default function Home() {
       <nav className="w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
         <div className="container max-w-7xl mx-auto flex justify-between items-center p-4">
           <div className="flex gap-6 items-center">
-            <Link href="/" className="flex items-center gap-2 font-bold text-xl">
+            <Link
+              href="/"
+              className="flex items-center gap-2 font-bold text-xl"
+            >
               <Dice6 className="h-6 w-6" />
               Shadowdark Tools
             </Link>
             <div className="hidden md:flex items-center gap-4 text-sm">
-              <Link href="/lists" className="hover:text-primary transition-colors">
+              <Link
+                href="/lists"
+                className="hover:text-primary transition-colors"
+              >
                 My Lists
               </Link>
-              <Link href="/tables/create" className="hover:text-primary transition-colors">
+              <Link
+                href="/tables/create"
+                className="hover:text-primary transition-colors"
+              >
                 Create Table
               </Link>
             </div>
@@ -38,8 +47,9 @@ export default function Home() {
             Shadowdark Magic Items
           </h1>
           <p className="text-xl text-muted-foreground mb-8 max-w-3xl mx-auto">
-            Browse, organize, and create custom roll tables for magic items in the Shadowdark RPG.
-            Manage your favorite items and share tables with your group.
+            Browse, organize, and create custom roll tables for magic items in
+            the Shadowdark RPG. Manage your favorite items and share tables with
+            your group.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button asChild size="lg">
@@ -58,35 +68,17 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Quick Stats */}
-      <section className="py-8 border-b border-border">
-        <div className="container max-w-7xl mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Card className="p-6 text-center">
-              <h3 className="text-2xl font-bold text-primary mb-2">300+</h3>
-              <p className="text-muted-foreground">Magic Items</p>
-            </Card>
-            <Card className="p-6 text-center">
-              <h3 className="text-2xl font-bold text-primary mb-2">8</h3>
-              <p className="text-muted-foreground">Item Categories</p>
-            </Card>
-            <Card className="p-6 text-center">
-              <h3 className="text-2xl font-bold text-primary mb-2">∞</h3>
-              <p className="text-muted-foreground">Custom Tables</p>
-            </Card>
-          </div>
-        </div>
-      </section>
-
       {/* Magic Item Browser */}
       <section id="browse" className="flex-1 py-12">
         <div className="container max-w-7xl mx-auto px-4">
           <h2 className="text-3xl font-bold mb-8">Browse Magic Items</h2>
-          <Suspense fallback={
-            <div className="flex items-center justify-center py-12">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-            </div>
-          }>
+          <Suspense
+            fallback={
+              <div className="flex items-center justify-center py-12">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+              </div>
+            }
+          >
             <MagicItemBrowser />
           </Suspense>
         </div>
