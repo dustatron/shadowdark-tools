@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { getUserLists, createList } from '@/lib/services/lists';
+import { ensureUserExists } from '@/lib/services/users';
 import { HttpStatus } from '@/types/api';
 
 export async function GET() {
@@ -83,6 +84,9 @@ export async function POST(request: NextRequest) {
     }
 
     try {
+      // Ensure user exists in public.users table before creating list
+      await ensureUserExists(user);
+
       const list = await createList(user.id, {
         name: body.name.trim(),
         description: body.description?.trim()

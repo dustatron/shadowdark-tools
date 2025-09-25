@@ -25,7 +25,10 @@
       "Bash(git checkout:*)",
       "mcp__playwright__browser_click",
       "mcp__playwright__browser_snapshot",
-      "Bash(pkill:*)"
+      "Bash(pkill:*)",
+      "mcp__playwright__browser_type",
+      "Bash(timeout 30s npm run db:up)",
+      "Bash(echo $NEXT_PUBLIC_SUPABASE_URL)"
     ],
     "deny": [],
     "ask": []
