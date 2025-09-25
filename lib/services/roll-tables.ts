@@ -153,7 +153,7 @@ export class RollTablesService {
         source_list_id: sourceListId || null,
         name: name.trim(),
         die_size: dieSize,
-        share_token: this.generateShareToken(),
+        share_token: RollTablesService.generateShareToken(),
         is_public: false,
         table_data: tableData as any // Cast to Json type
       };
@@ -167,7 +167,7 @@ export class RollTablesService {
       if (error) {
         if (error.code === '23505' && error.message.includes('share_token')) {
           // Retry with new token if collision (very unlikely)
-          tableInsert.share_token = this.generateShareToken();
+          tableInsert.share_token = RollTablesService.generateShareToken();
           const { data: retryData, error: retryError } = await supabase
             .from('roll_tables')
             .insert(tableInsert)
@@ -303,7 +303,7 @@ export class RollTablesService {
     try {
       const supabase = await createClient();
 
-      const newToken = this.generateShareToken();
+      const newToken = RollTablesService.generateShareToken();
 
       const { data, error } = await supabase
         .from('roll_tables')

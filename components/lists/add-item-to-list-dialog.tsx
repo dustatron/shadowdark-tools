@@ -38,6 +38,28 @@ export function AddItemToListDialog({ listId, children, onItemAdded }: AddItemTo
   const [loading, setLoading] = useState(false);
   const [addingItems, setAddingItems] = useState<Set<string>>(new Set());
 
+  const searchItems = useCallback(async () => {
+    try {
+      setLoading(true);
+      const params = new URLSearchParams();
+      if (searchTerm) params.append("search", searchTerm);
+
+      const response = await fetch(`/api/magic-items?${params}`);
+      if (response.ok) {
+        const data = await response.json();
+        setItems(Array.isArray(data.data?.data) ? data.data.data : []);
+      } else {
+        console.error("API error:", response.status, response.statusText);
+        setItems([]);
+      }
+    } catch (error) {
+      console.error("Error searching items:", error);
+      setItems([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [searchTerm]);
+
   useEffect(() => {
     if (open && searchTerm) {
       const timeoutId = setTimeout(searchItems, 300);
@@ -48,31 +70,13 @@ export function AddItemToListDialog({ listId, children, onItemAdded }: AddItemTo
     }
   }, [searchTerm, open, searchItems]);
 
-  const searchItems = useCallback(async () => {
-    try {
-      setLoading(true);
-      const params = new URLSearchParams();
-      if (searchTerm) params.append("search", searchTerm);
-
-      const response = await fetch(`/api/magic-items?${params}`);
-      if (response.ok) {
-        const data = await response.json();
-        setItems(data.data || []);
-      }
-    } catch (error) {
-      console.error("Error searching items:", error);
-    } finally {
-      setLoading(false);
-    }
-  }, [searchTerm]);
-
   const addItemToList = async (itemSlug: string) => {
     try {
       setAddingItems(prev => new Set(prev).add(itemSlug));
       const response = await fetch(`/api/lists/${listId}/items`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ itemSlug }),
+        body: JSON.stringify({ magicItemId: itemSlug }),
       });
 
       if (response.ok) {
@@ -129,7 +133,7 @@ export function AddItemToListDialog({ listId, children, onItemAdded }: AddItemTo
               </div>
             ) : (
               <div className="space-y-2">
-                {items.map((item) => (
+                {Array.isArray(items) && items.map((item) => (
                   <div
                     key={item.slug}
                     className="flex items-start justify-between p-3 border rounded-lg hover:bg-muted/50 transition-colors"

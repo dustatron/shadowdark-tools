@@ -44,7 +44,7 @@ export function RollTableContent({ tableId }: RollTableContentProps) {
       }
 
       const data = await response.json();
-      setTable(data);
+      setTable(data.data);
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
     } finally {

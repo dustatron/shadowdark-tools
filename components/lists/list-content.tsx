@@ -62,20 +62,6 @@ export function ListContent({ listId, addItemSlug }: ListContentProps) {
   const { user } = useAuth();
   const router = useRouter();
 
-  useEffect(() => {
-    if (user) {
-      fetchList();
-    } else {
-      setLoading(false);
-    }
-  }, [user, listId, fetchList]);
-
-  useEffect(() => {
-    if (addItemSlug && list) {
-      handleAddItem(addItemSlug);
-    }
-  }, [addItemSlug, list, handleAddItem]);
-
   const fetchList = useCallback(async () => {
     try {
       setLoading(true);
@@ -88,7 +74,15 @@ export function ListContent({ listId, addItemSlug }: ListContentProps) {
       }
 
       const data = await response.json();
-      setList(data);
+      const listData = data.data;
+
+      // Transform the API response to match the expected component structure
+      const transformedList = {
+        ...listData,
+        items: listData.items?.map((item: any) => item.magicItem).filter(Boolean) || []
+      };
+
+      setList(transformedList);
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
     } finally {
@@ -103,7 +97,7 @@ export function ListContent({ listId, addItemSlug }: ListContentProps) {
       const response = await fetch(`/api/lists/${listId}/items`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ itemSlug }),
+        body: JSON.stringify({ magicItemId: itemSlug }),
       });
 
       if (response.ok) {
@@ -117,6 +111,20 @@ export function ListContent({ listId, addItemSlug }: ListContentProps) {
     }
   }, [list, listId, fetchList, router]);
 
+  useEffect(() => {
+    if (user) {
+      fetchList();
+    } else {
+      setLoading(false);
+    }
+  }, [user, listId, fetchList]);
+
+  useEffect(() => {
+    if (addItemSlug && list) {
+      handleAddItem(addItemSlug);
+    }
+  }, [addItemSlug, list, handleAddItem]);
+
   const removeItem = async (itemSlug: string) => {
     if (!confirm("Remove this item from the list?")) return;
 
@@ -124,7 +132,7 @@ export function ListContent({ listId, addItemSlug }: ListContentProps) {
       const response = await fetch(`/api/lists/${listId}/items`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ itemSlug }),
+        body: JSON.stringify({ magicItemId: itemSlug }),
       });
 
       if (response.ok) {
@@ -199,7 +207,7 @@ export function ListContent({ listId, addItemSlug }: ListContentProps) {
           )}
           <div className="flex items-center gap-2 flex-wrap">
             <Badge variant="secondary">
-              {list.items.length} item{list.items.length !== 1 ? "s" : ""}
+              {list.items?.length || 0} item{(list.items?.length || 0) !== 1 ? "s" : ""}
             </Badge>
             <div className="text-sm text-muted-foreground flex items-center gap-1">
               <Calendar className="h-3 w-3" />
@@ -238,7 +246,7 @@ export function ListContent({ listId, addItemSlug }: ListContentProps) {
       )}
 
       {/* Items Grid */}
-      {list.items.length === 0 ? (
+      {!list.items || list.items.length === 0 ? (
         <div className="text-center py-12">
           <h3 className="text-xl font-semibold mb-2">No items yet</h3>
           <p className="text-muted-foreground mb-6">
@@ -253,7 +261,7 @@ export function ListContent({ listId, addItemSlug }: ListContentProps) {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {list.items.map((item) => (
+          {list.items?.map((item) => (
             <Card key={item.slug} className="hover:shadow-md transition-shadow">
               <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-3">
                 <div className="space-y-1 flex-1">

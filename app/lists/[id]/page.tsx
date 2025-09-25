@@ -7,8 +7,8 @@ import { ThemeSwitcher } from "@/components/theme-switcher";
 import { ListContent } from "@/components/lists/list-content";
 
 interface PageProps {
-  params: { id: string };
-  searchParams: { add?: string };
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ add?: string }>;
 }
 
 async function getList(id: string) {
@@ -22,7 +22,8 @@ async function getList(id: string) {
 }
 
 export async function generateMetadata({ params }: PageProps) {
-  const list = await getList(params.id);
+  const { id } = await params;
+  const list = await getList(id);
 
   if (!list) {
     return {
@@ -37,7 +38,9 @@ export async function generateMetadata({ params }: PageProps) {
 }
 
 export default async function ListPage({ params, searchParams }: PageProps) {
-  const list = await getList(params.id);
+  const { id } = await params;
+  const { add } = await searchParams;
+  const list = await getList(id);
 
   if (!list) {
     notFound();
@@ -82,8 +85,8 @@ export default async function ListPage({ params, searchParams }: PageProps) {
 
           <Suspense fallback={<ListLoadingSkeleton />}>
             <ListContent
-              listId={params.id}
-              addItemSlug={searchParams.add}
+              listId={id}
+              addItemSlug={add}
             />
           </Suspense>
         </div>

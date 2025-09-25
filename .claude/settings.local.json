@@ -28,7 +28,9 @@
       "Bash(pkill:*)",
       "mcp__playwright__browser_type",
       "Bash(timeout 30s npm run db:up)",
-      "Bash(echo $NEXT_PUBLIC_SUPABASE_URL)"
+      "Bash(echo $NEXT_PUBLIC_SUPABASE_URL)",
+      "mcp__playwright__browser_take_screenshot",
+      "mcp__playwright__browser_wait_for"
     ],
     "deny": [],
     "ask": []
